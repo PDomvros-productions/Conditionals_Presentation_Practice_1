@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>If This, Then That! | Conditionals Lab</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Nunito:wght@400;700;800&display=swap");
+
+    :root {
+      --bg1: #050816;
+      --bg2: #10002b;
+      --card: rgba(15, 20, 54, 0.70);
+      --card-strong: rgba(34, 40, 96, 0.80);
+      --text: #f8fbff;
+      --muted: #d3ddff;
+      --pink: #ff4fd8;
+      --yellow: #ffe45e;
+      --blue: #3cf2ff;
+      --green: #62ffb0;
+      --purple: #9d7bff;
+      --orange: #ff9f1c;
+      --danger: #ff3b30;
+      --cond: #ff9f1c;
+      --result: #ff3b30;
+      --glow-blue: 0 0 14px rgba(60,242,255,0.55);
+      --glow-pink: 0 0 18px rgba(255,79,216,0.45);
+      --shadow: 0 22px 55px rgba(0,0,0,0.48);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: "Nunito", "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(157,123,255,0.35), transparent 28%),
+        radial-gradient(circle at top right, rgba(60,242,255,0.28), transparent 24%),
+        radial-gradient(circle at bottom center, rgba(255,79,216,0.24), transparent 26%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+      overflow: auto;
+    }
+
+    .deck {
+      position: relative;
+      width: 100vw;
+      min-height: 100vh;
+      height: auto;
+      padding: 8px 10px 56px;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      min-height: calc(100vh - 60px);
+      height: auto;
+      border-radius: 30px;
+      background: linear-gradient(160deg, rgba(20,25,70,0.88), rgba(10,13,38,0.82));
+      border: 1px solid rgba(60,242,255,0.28);
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,79,216,0.12), 0 0 28px rgba(60,242,255,0.10);
+      backdrop-filter: blur(16px);
+      padding: 18px 20px 20px;
+      overflow: visible;
+    }
+
+    .slide.active { display: block; animation: fadeIn 0.45s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(90deg, rgba(60,242,255,0.15), rgba(255,79,216,0.16));
+      border: 1px solid rgba(60,242,255,0.30);
+      border-radius: 999px;
+      padding: 6px 12px;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      box-shadow: var(--glow-blue);
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 6px;
+      line-height: 1.1;
+      font-family: "Orbitron", "Arial Black", sans-serif;
+      letter-spacing: 0.03em;
+      text-shadow: 0 0 14px rgba(60,242,255,0.20), 0 0 24px rgba(255,79,216,0.18);
+    }
+    h1 { font-size: clamp(2.7rem, 5vw, 5rem); margin-bottom: 10px; }
+    h2 { font-size: clamp(1.95rem, 3.1vw, 2.9rem); margin-bottom: 8px; }
+    h3 { font-size: clamp(1.15rem, 1.7vw, 1.45rem); }
+    p, li { color: var(--muted); font-size: clamp(1.02rem, 1.25vw, 1.2rem); line-height: 1.42; margin: 0 0 8px; }
+    strong { color: #fff; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+      align-items: start;
+      align-content: start;
+      min-height: auto;
+    }
+
+    .hero .titlebox {
+      padding: 6px 8px 0 0;
+    }
+
+    .hero .titlebox p {
+      max-width: 840px;
+      font-size: clamp(1.08rem, 1.35vw, 1.34rem);
+    }
+
+    .pillrow, .mini-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-weight: 800;
+      font-size: 1.12rem;
+      color: #08111f;
+      background: linear-gradient(90deg, var(--yellow), #fff7a8);
+      box-shadow: 0 0 18px rgba(255,228,94,0.35);
+    }
+
+    .hero-visual {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .slide-intro .hero-visual {
+      margin-top: clamp(28px, 4vw, 54px);
+    }
+
+    .visual-card, .card, .formula, .quiz-card, .situation-card, .timeline-card, .challenge-card, .legend-card {
+      background: var(--card);
+      border: 1px solid rgba(60,242,255,0.18);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.18), inset 0 0 0 1px rgba(255,79,216,0.10);
+    }
+
+    .visual-card.big {
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      background: linear-gradient(145deg, rgba(157,123,255,0.22), rgba(60,242,255,0.18));
+      box-shadow: 0 0 34px rgba(60,242,255,0.12), inset 0 0 0 1px rgba(255,79,216,0.12);
+    }
+
+    .domino {
+      display: flex;
+      justify-content: center;
+      align-items: end;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .domino span {
+      display: inline-block;
+      width: 30px;
+      border-radius: 10px 10px 4px 4px;
+      background: linear-gradient(180deg, #fff, #9be8ff);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.25);
+      animation: topple 2.4s infinite;
+      transform-origin: bottom center;
+    }
+
+    .domino span:nth-child(1){ height: 52px; animation-delay: 0s; }
+    .domino span:nth-child(2){ height: 60px; animation-delay: 0.12s; }
+    .domino span:nth-child(3){ height: 68px; animation-delay: 0.24s; }
+    .domino span:nth-child(4){ height: 76px; animation-delay: 0.36s; }
+    .domino span:nth-child(5){ height: 84px; animation-delay: 0.48s; }
+
+    @keyframes topple {
+      0%, 22%, 100% { transform: rotate(0); opacity: 0.9; }
+      30% { transform: rotate(72deg) translateX(14px); opacity: 1; }
+      42% { transform: rotate(72deg) translateX(14px); }
+    }
+
+    .grid-2, .grid-3, .grid-4 {
+      display: grid;
+      gap: 12px;
+    }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .concept-box {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      align-items: stretch;
+      margin-top: 12px;
+    }
+
+    .concept-side {
+      border-radius: 22px;
+      padding: 16px;
+      background: rgba(24, 30, 76, 0.75);
+      border: 1px solid rgba(60,242,255,0.18);
+    }
+
+    .condition { box-shadow: inset 0 0 0 2px rgba(60,242,255,0.32), 0 0 20px rgba(60,242,255,0.10); }
+    .result { box-shadow: inset 0 0 0 2px rgba(98,255,176,0.30), 0 0 20px rgba(98,255,176,0.08); }
+
+    .arrow {
+      display: grid;
+      place-items: center;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--yellow);
+    }
+
+    .formula {
+      background: linear-gradient(145deg, rgba(31,40,104,0.88), rgba(14,20,58,0.82));
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .formula .tag {
+      display: inline-block;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: #07101c;
+    }
+
+    .zero { background: linear-gradient(90deg, #fde047, #facc15); }
+    .first { background: linear-gradient(90deg, #67e8f9, #38bdf8); }
+    .second { background: linear-gradient(90deg, #c4b5fd, #a78bfa); }
+    .third { background: linear-gradient(90deg, #fdba74, #fb923c); }
+    .mixed { background: linear-gradient(90deg, #f9a8d4, #f472b6); }
+    .contrast-tag {
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244,247,255,0.94)) !important;
+      color: #07101c;
+      border: 2px solid rgba(255,255,255,0.85);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.45) inset;
+    }
+
+    .condtext {
+      color: var(--cond);
+      font-weight: 800;
+      text-shadow: 0 0 12px rgba(255,159,28,0.48);
+    }
+
+    .restext {
+      color: var(--result);
+      font-weight: 800;
+      text-shadow: 0 0 12px rgba(255,59,48,0.42);
+    }
+
+    .example {
+      font-size: 1.08rem;
+      color: #fff;
+      background: rgba(0,0,0,0.16);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+
+    .time-strip {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .time-chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(60,242,255,0.18);
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .memory-map {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0,1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .memory-item {
+      padding: 14px 12px;
+      border-radius: 22px;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.14);
+      text-align: center;
+      min-height: 0;
+    }
+
+    .memory-item .icon {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .timeline-wrap {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 8px;
+    }
+
+    .line {
+      position: relative;
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      overflow: hidden;
+    }
+
+    .fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+      border-radius: 999px;
+    }
+
+    .line-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .situation-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .situation-card {
+      position: relative;
+      padding-bottom: 60px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .situation-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255,79,216,0.42);
+      box-shadow: 0 0 24px rgba(255,79,216,0.14);
+    }
+
+    .situation-title {
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.98rem;
+      margin-bottom: 8px;
+    }
+
+    .reveal-btn, .nav-btn, .small-btn, .answer-btn, .reset-btn {
+      cursor: pointer;
+      border: none;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .reveal-btn:hover, .nav-btn:hover, .small-btn:hover, .answer-btn:hover, .reset-btn:hover { transform: scale(1.03); }
+    .reveal-btn, .small-btn { background: linear-gradient(90deg, var(--pink), var(--yellow)); color: #07101c; box-shadow: var(--glow-pink); }
+    .answer-btn { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(60,242,255,0.18); }
+    .answer-btn.correct { background: rgba(52,211,153,0.22); border-color: rgba(52,211,153,0.55); }
+    .answer-btn.wrong { background: rgba(251,113,133,0.20); border-color: rgba(251,113,133,0.55); }
+    .reset-btn { background: linear-gradient(90deg, #f472b6, #f9a8d4); color: #07101c; }
+
+    .reveal {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      display: none;
+      background: rgba(6,9,26,0.82);
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid rgba(60,242,255,0.18);
+    }
+
+    .reveal.show { display: block; }
+
+    .challenge-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .level {
+      display: inline-block;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      color: #07101c;
+      background: #fff;
+    }
+
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .quiz-card h3 { margin-bottom: 10px; }
+
+    .answers {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .feedback {
+      margin-top: 8px;
+      font-weight: 700;
+      min-height: 22px;
+    }
+
+    .scoreboard {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(17, 24, 66, 0.78);
+      border: 1px solid rgba(60,242,255,0.18);
+    }
+
+    .score-number {
+      font-size: 1.65rem;
+      font-weight: 900;
+      color: #fff;
+    }
+
+
+
+    .flip-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .scenario-card {
+      position: relative;
+      padding-bottom: 92px;
+    }
+
+    .scenario-card .situation-title {
+      font-size: 1.02rem;
+      margin-bottom: 6px;
+    }
+
+    .use-line {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: #fff;
+      font-size: 0.98rem;
+      line-height: 1.35;
+    }
+
+    .use-line strong {
+      color: var(--yellow);
+    }
+
+    .practice-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(17, 24, 66, 0.72);
+      border: 1px solid rgba(60,242,255,0.18);
+    }
+
+    .practice-tools p {
+      margin: 0;
+    }
+
+    .footer-note {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    .nav {
+      position: fixed;
+      left: 10px;
+      right: 10px;
+      bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .nav-center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .nav-center {
+      flex: 0 0 auto;
+      min-width: 72px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(7, 10, 30, 0.56);
+      border: 1px solid rgba(60,242,255,0.14);
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .dot { display:none !important; width:0; height:0; border:none; padding:0; margin:0; }
+
+    .timeline-wrap > .timeline-card:last-child { grid-column: 1 / -1; }
+
+    @media (max-height: 780px) {
+      h1 { font-size: clamp(2.3rem, 4.2vw, 3.6rem); }
+      h2 { font-size: clamp(1.7rem, 2.6vw, 2.4rem); }
+      p, li { font-size: clamp(0.98rem, 1.18vw, 1.08rem); }
+      .pill { font-size: 0.92rem; }
+      .logo-corner { width: min(72px, 10vw); }
+    }
+
+    @media (pointer: coarse) {
+      .nav-btn, .reveal-btn, .answer-btn, .reset-btn { min-height: 40px; }
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      border: 1px solid rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .dot.active { background: var(--pink); transform: scale(1.18); box-shadow: 0 0 16px rgba(255,79,216,0.6); }
+
+    .nav-btn {
+      background: linear-gradient(90deg, rgba(60,242,255,0.18), rgba(255,79,216,0.18));
+      color: #fff;
+      border: 1px solid rgba(60,242,255,0.28);
+      min-width: 94px;
+      box-shadow: var(--glow-blue);
+    }
+
+    .neon-note {
+      margin-top: 10px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: linear-gradient(90deg, rgba(60,242,255,0.10), rgba(255,79,216,0.10));
+      border: 1px solid rgba(60,242,255,0.22);
+      box-shadow: inset 0 0 0 1px rgba(255,79,216,0.10);
+    }
+
+    .neon-note strong { color: var(--yellow); }
+
+    .logo-corner {
+      position: fixed;
+      top: 8px;
+      right: 12px;
+      width: min(86px, 12vw);
+      z-index: 30;
+      filter: drop-shadow(0 0 10px rgba(60,242,255,0.34)) drop-shadow(0 0 18px rgba(255,79,216,0.16));
+    }
+
+    .topline {
+      padding-right: 88px;
+    }
+
+    .global-footer {
+      position: fixed;
+      left: 50%;
+      bottom: 42px;
+      transform: translateX(-50%);
+      z-index: 20;
+      max-width: calc(100vw - 26px);
+      text-align: center;
+      font-size: 0.7rem;
+      color: #f6f6ff;
+      letter-spacing: 0.03em;
+      text-shadow: 0 0 12px rgba(60,242,255,0.30);
+      background: rgba(7, 10, 30, 0.46);
+      border: 1px solid rgba(60,242,255,0.14);
+      border-radius: 999px;
+      padding: 4px 10px;
+      backdrop-filter: blur(8px);
+    }
+
+    @media (max-width: 1100px) {
+      .hero, .grid-2, .grid-3, .grid-4, .quiz-grid, .situation-grid, .flip-grid, .memory-map {
+        grid-template-columns: 1fr 1fr;
+      }
+      .memory-map { grid-template-columns: 1fr 1fr 1fr; }
+      .situation-grid, .quiz-grid, .flip-grid, .timeline-wrap { grid-template-columns: 1fr 1fr; }
+      .hero { grid-template-columns: 1fr; }
+      .slide-intro .hero-visual { margin-top: 24px; }
+    }
+
+    @media (max-width: 760px) {
+      body { overflow: auto; }
+      .deck { height: auto; min-height: 100vh; padding-bottom: 84px; }
+      .slide { height: auto; min-height: calc(100vh - 96px); padding: 14px 14px 18px; }
+      h1 { font-size: clamp(2.15rem, 10vw, 3.4rem); }
+      h2 { font-size: clamp(1.65rem, 6.8vw, 2.25rem); }
+      h3 { font-size: clamp(1.05rem, 5vw, 1.28rem); }
+      p, li { font-size: 1rem; }
+      .pill { font-size: 0.9rem; padding: 7px 12px; }
+      .grid-2, .grid-3, .grid-4, .quiz-grid, .situation-grid, .flip-grid, .memory-map, .concept-box, .timeline-wrap {
+        grid-template-columns: 1fr;
+      }
+      .concept-box { grid-template-columns: 1fr; }
+      .arrow { transform: rotate(90deg); }
+      .nav { left: 8px; right: 8px; }
+      .nav-btn { min-width: 74px; font-size: 0.88rem; padding: 8px 12px; }
+      .topline { padding-right: 0; }
+      .logo-corner { width: 62px; top: 8px; right: 8px; }
+      .global-footer { bottom: 34px; font-size: 0.56rem; }
+      .slide-intro .hero-visual { margin-top: 18px; }
+    }
+  
+
+    .slide-welcome {
+      position: relative;
+      padding-top: 24px;
+    }
+
+    .welcome-shell {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .welcome-hero {
+      text-align: center;
+      padding: 6px 110px 0 26px;
+    }
+
+    .welcome-hero h1 {
+      font-size: clamp(1.9rem, 3.4vw, 3.3rem);
+      margin-bottom: 6px;
+    }
+
+    .welcome-image-card {
+      background: linear-gradient(145deg, rgba(31,40,104,0.72), rgba(14,20,58,0.66));
+      border: 1px solid rgba(60,242,255,0.22);
+      border-radius: 30px;
+      padding: 12px;
+      box-shadow: 0 18px 36px rgba(0,0,0,0.24), inset 0 0 0 1px rgba(255,79,216,0.12), 0 0 26px rgba(60,242,255,0.10);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .welcome-image {
+      display: block;
+      width: min(100%, 92%);
+      max-height: calc(100vh - 220px);
+      min-height: 320px;
+      object-fit: contain;
+      object-position: center top;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.28);
+      margin: 0 auto;
+      background: rgba(8, 12, 42, 0.55);
+    }
+
+  
+    @media (max-width: 900px) {
+      .slide-welcome { padding-top: 16px; }
+      .welcome-hero { padding: 0 78px 0 8px; text-align: left; }
+      .welcome-hero h1 { font-size: clamp(1.7rem, 6.2vw, 2.6rem); }
+      .welcome-image { width: min(100%, 96%); max-height: none; min-height: 240px; aspect-ratio: 16 / 9; object-fit: contain; }
+    }
+
+    @media (max-width: 560px) {
+      .welcome-hero { padding-right: 62px; }
+      .welcome-image-card { padding: 8px; border-radius: 22px; }
+      .welcome-image { width: 100%; border-radius: 16px; min-height: 190px; object-fit: contain; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <img src="logo.png" alt="Panagiotis Domvros EFL Hub logo" class="logo-corner">
+
+    <section class="slide active slide-welcome">
+      <div class="welcome-shell">
+        <div class="welcome-hero">
+          <h1>Conditionals Presentation &amp; Practice</h1>
+        </div>
+        <div class="welcome-image-card">
+          <img src="image.png" alt="Welcome illustration" class="welcome-image">
+        </div>
+      </div>
+    </section>
+
+    <section class="slide slide-intro">
+      <div class="topline">
+</div>
+      <div class="hero">
+        <div class="titlebox">
+          <h1>If this happens...<br>then that happens.</h1>
+          <p>
+            A bright, memorable way for you to revise <strong><span class="condtext">condition</span> + <span class="restext">result</span></strong>, then move into
+            <strong>zero, first, second, third</strong> and a light introduction to <strong>mixed conditionals</strong>.
+          </p>
+          <div class="pillrow">
+            <span class="pill">0 = facts</span>
+            <span class="pill" style="background:linear-gradient(90deg,var(--blue),#bae6fd);">1 = real future</span>
+            <span class="pill" style="background:linear-gradient(90deg,var(--purple),#ddd6fe);">2 = imaginary now/future</span>
+            <span class="pill" style="background:linear-gradient(90deg,var(--orange),#fed7aa);">3 = unreal past</span>
+            <span class="pill" style="background:linear-gradient(90deg,var(--pink),#fbcfe8);">Mixed = time bridge</span>
+          </div>
+</div>
+        <div class="hero-visual">
+          <div class="visual-card big">
+            <div>
+              <h2>Think dominoes 🎯</h2>
+              <p>One thing happens first. It causes another thing.</p>
+              <div class="domino"><span></span><span></span><span></span><span></span><span></span></div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="visual-card">
+              <h3><span class="condtext">Condition</span></h3>
+              <p>The <strong class="condtext">if-part</strong>. It is the trigger.</p>
+              <div class="example"><span class="condtext">If I study tonight</span>, ...</div>
+            </div>
+            <div class="visual-card">
+              <h3><span class="restext">Result</span></h3>
+              <p>The <strong class="restext">main clause</strong>. It is the consequence.</p>
+              <div class="example">... <span class="restext">I will do well tomorrow</span>.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="topline">
+        <div class="badge">1 / Core concept</div>
+        <div class="badge">Condition + Result</div>
+      </div>
+      <h2><span class="condtext">Condition</span> and <span class="restext">result</span></h2>
+      
+      <div class="concept-box">
+        <div class="concept-side condition">
+          <h3>🔵 <span class="condtext">Condition</span> = trigger</h3>
+          <p>This is the <strong class="condtext">if-clause</strong>.</p>
+          <div class="example"><span class="condtext">If you heat ice</span>, ...</div>
+          <div class="example"><span class="condtext">If it rains tomorrow</span>, ...</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="concept-side result">
+          <h3>🟢 <span class="restext">Result</span> = consequence</h3>
+          <p>This is the <strong class="restext">main clause</strong>.</p>
+          <div class="example">... <span class="restext">it melts</span>.</div>
+          <div class="example">... <span class="restext">we will stay inside</span>.</div>
+        </div>
+      </div>
+      <div class="grid-3" style="margin-top:10px;">
+        <div class="card">
+          <h3>Golden rule 1</h3>
+          <p><strong class="condtext">If</strong> can come first or second.</p>
+          <div class="example"><span class="condtext">If I see her</span>, <span class="restext">I'll tell her</span>.</div>
+          <div class="example"><span class="restext">I'll tell her</span> <span class="condtext">if I see her</span>.</div>
+        </div>
+        <div class="card">
+          <h3>Golden rule 2</h3>
+          <p>Use a comma only when the <strong class="condtext">if-clause comes first</strong>.</p>
+          <div class="example"><span class="condtext">If I see her</span>, <span class="restext">I'll tell her</span>.</div>
+        </div>
+        <div class="card">
+          <h3>Golden rule 3</h3>
+          <p>Always ask: <strong>Is this real? imagined? past? future? always true?</strong></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="topline">
+        <div class="badge">2 / Time-world map</div>
+        <div class="badge">Time-world map</div>
+      </div>
+      <h2>Each conditional lives in a different world</h2>
+      
+      <div class="memory-map">
+        <div class="memory-item">
+          <span class="icon">🔁</span>
+          <h3>Zero</h3>
+          <p>Always true.<br>Facts, routines, rules.</p>
+          <div class="time-chip">always / usually</div>
+        </div>
+        <div class="memory-item">
+          <span class="icon">🚪</span>
+          <h3>First</h3>
+          <p>Real possibility.<br>Open future door.</p>
+          <div class="time-chip">maybe tomorrow</div>
+        </div>
+        <div class="memory-item">
+          <span class="icon">☁️</span>
+          <h3>Second</h3>
+          <p>Imaginary now or future.<br>Dream world.</p>
+          <div class="time-chip">not real now</div>
+        </div>
+        <div class="memory-item">
+          <span class="icon">⏪</span>
+          <h3>Third</h3>
+          <p>Imaginary past.<br>Too late to change.</p>
+          <div class="time-chip">past regret</div>
+        </div>
+        <div class="memory-item">
+          <span class="icon">🌉</span>
+          <h3>Mixed</h3>
+          <p>Two times connect.<br>Past ↔ present.</p>
+          <div class="time-chip">time bridge</div>
+        </div>
+      </div>
+</section>
+
+    <section class="slide">
+      <div class="topline">
+        <div class="badge">3 / Forms</div>
+        <div class="badge">Zero + First</div>
+      </div>
+      <h2>Zero + first</h2>
+      <div class="grid-2">
+        <div class="formula">
+          <span class="tag zero"><span class="condtext">ZERO</span> CONDITIONAL</span>
+          <h3>For facts, rules, routines, and things that are generally true</h3>
+          <div class="example"><span class="condtext">If + present simple</span>, <span class="restext">present simple</span></div>
+          <div class="example"><span class="condtext">If people don't drink water</span>, <span class="restext">they get thirsty</span>.</div>
+          <div class="time-strip">
+            <span class="time-chip">always true</span>
+            <span class="time-chip">science</span>
+            <span class="time-chip">instructions</span>
+          </div>
+        </div>
+        <div class="formula">
+          <span class="tag first"><span class="condtext">FIRST</span> CONDITIONAL</span>
+          <h3>For real future possibilities</h3>
+          <div class="example"><span class="condtext">If + present simple</span>, <span class="restext">will + base verb</span></div>
+          <div class="example"><span class="condtext">If it rains tomorrow</span>, <span class="restext">we'll cancel the match</span>.</div>
+          <div class="time-strip">
+            <span class="time-chip">possible future</span>
+            <span class="time-chip">plans</span>
+            <span class="time-chip">warnings</span>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:10px;">
+        <div class="card">
+          <h3>Fast contrast</h3>
+          <p><strong>Zero:</strong> <span class="condtext">If you mix blue and yellow</span>, <span class="restext">you get green</span>.</p>
+          <p><strong>First:</strong> <span class="condtext">If you mix these two paints</span>, <span class="restext">you'll get green</span>.</p>
+        </div>
+        <div class="card">
+          <h3>Meaning note</h3>
+          <p>Contrast <strong>general truth</strong> with <strong>specific future possibility</strong>. That difference solves many mistakes.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="topline">
+        <div class="badge">4 / Forms</div>
+        <div class="badge">Second + Third</div>
+      </div>
+      <h2>Second + third</h2>
+      <div class="grid-2">
+        <div class="formula">
+          <span class="tag second"><span class="condtext">SECOND</span> CONDITIONAL</span>
+          <h3>Imaginary present or future</h3>
+          <div class="example"><span class="condtext">If + past simple</span>, <span class="restext">would + base verb</span></div>
+          <div class="example"><span class="condtext">If I had a million euros</span>, <span class="restext">I would travel for a year</span>.</div>
+          <div class="time-strip">
+            <span class="time-chip">imaginary now</span>
+            <span class="time-chip">dreams</span>
+            <span class="time-chip">advice</span>
+          </div>
+        </div>
+        <div class="formula">
+          <span class="tag third"><span class="condtext">THIRD</span> CONDITIONAL</span>
+          <h3>Imaginary past / regret / criticism</h3>
+          <div class="example"><span class="condtext">If + past perfect</span>, <span class="restext">would have + past participle</span></div>
+          <div class="example"><span class="condtext">If she had studied more</span>, <span class="restext">she would have passed</span>.</div>
+          <div class="time-strip">
+            <span class="time-chip">past regret</span>
+            <span class="time-chip">can't change now</span>
+            <span class="time-chip">looking back</span>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:10px;">
+        <div class="card">
+          <h3>Important meaning clue</h3>
+          <p><strong>Second</strong> = not real now.</p>
+          <p><strong>Third</strong> = not real in the past.</p>
+        </div>
+        <div class="card">
+          <h3>Useful self-check</h3>
+          <p>Ask: <strong>Can we still change it?</strong></p>
+          <p>If yes or maybe yes → second. If no, because it is finished → third.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="topline">
+        <div class="badge">5 / Stretch</div>
+        <div class="badge">Mixed conditionals</div>
+      </div>
+      <h2>Mixed conditionals = a bridge between two times</h2>
+      
+      <div class="grid-2">
+        <div class="formula">
+          <span class="tag mixed contrast-tag"><span class="condtext">PAST</span> → <span class="restext">PRESENT</span></span>
+          <h3>A past action affects the present</h3>
+          <div class="example"><span class="condtext">If + past perfect</span>, <span class="restext">would + base verb</span></div>
+          <div class="example"><span class="condtext">If I had gone to bed earlier</span>, <span class="restext">I wouldn't be so tired now</span>.</div>
+        </div>
+        <div class="formula">
+          <span class="tag mixed contrast-tag"><span class="condtext">PRESENT</span> → <span class="restext">PAST</span></span>
+          <h3>A present situation affected the past</h3>
+          <div class="example"><span class="condtext">If + past simple</span>, <span class="restext">would have + past participle</span></div>
+          <div class="example"><span class="condtext">If I were more organised</span>, <span class="restext">I would have finished the project yesterday</span>.</div>
+        </div>
+      </div>
+</section>
+
+    <section class="slide">
+      <div class="topline">
+        <div class="badge">6 / Compare</div>
+        <div class="badge">See time visually</div>
+      </div>
+      <h2>Timeline map</h2>
+      
+      <div class="timeline-wrap">
+        <div class="timeline-card">
+          <h3>Zero conditional</h3>
+          <div class="line"><div class="fill" style="width:100%; background:linear-gradient(90deg,#fde047,#facc15);"></div></div>
+          <div class="line-labels"><span>past</span><span>always true</span><span>future</span></div>
+        </div>
+        <div class="timeline-card">
+          <h3>First conditional</h3>
+          <div class="line"><div class="fill" style="width:62%; background:linear-gradient(90deg,#67e8f9,#38bdf8); margin-left:38%;"></div></div>
+          <div class="line-labels"><span>now</span><span>possible future result</span><span>later</span></div>
+        </div>
+        <div class="timeline-card">
+          <h3>Second conditional</h3>
+          <div class="line"><div class="fill" style="width:55%; background:linear-gradient(90deg,#c4b5fd,#a78bfa); margin-left:26%;"></div></div>
+          <div class="line-labels"><span>now</span><span>imaginary now/future</span><span>later</span></div>
+        </div>
+        <div class="timeline-card">
+          <h3>Third conditional</h3>
+          <div class="line"><div class="fill" style="width:35%; background:linear-gradient(90deg,#fdba74,#fb923c);"></div></div>
+          <div class="line-labels"><span>past</span><span>imaginary past</span><span>now</span></div>
+        </div>
+        <div class="timeline-card">
+          <h3>Mixed conditional</h3>
+          <div class="line"><div class="fill" style="width:85%; background:linear-gradient(90deg,#f9a8d4,#f472b6);"></div></div>
+          <div class="line-labels"><span>past</span><span>bridge between times</span><span>now / later</span></div>
+        </div>
+      </div>
+    </section>
+
+    
+
+
+    <section class="slide">
+      <div class="topline">
+        <div class="badge">7 / Practice</div>
+        <div class="badge">Scenario set 1</div>
+      </div>
+      <h2>Scenario practice 1</h2>
+      <div class="practice-tools">
+        <p>Choose the best conditional, use the prompt verbs, say your sentence, then flip the card to check.</p>
+        <button class="small-btn" onclick="shufflePracticeCards('practiceFlipGrid1')">Shuffle cards</button>
+      </div>
+      <div class="flip-grid" id="practiceFlipGrid1">
+        <div class="situation-card scenario-card">
+          <div class="situation-title">1. Present personality, past result</div>
+          <p>Noah is so disorganised that yesterday he forgot his notes at home.</p>
+          <div class="use-line"><strong>Use:</strong> be / not forget</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Mixed conditional.<br><em><span class="condtext">If Noah were more organised</span>, <span class="restext">he wouldn't have forgotten his notes yesterday</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">2. Tomorrow's forecast</div>
+          <p>The forecast says there may be snow tomorrow during football practice.</p>
+          <div class="use-line"><strong>Use:</strong> snow / cancel</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> First conditional.<br><em><span class="condtext">If it snows tomorrow</span>, <span class="restext">we'll cancel football practice</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">3. Lost essay</div>
+          <p>Lara didn't save her file, so she lost her essay.</p>
+          <div class="use-line"><strong>Use:</strong> save / not lose</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Third conditional.<br><em><span class="condtext">If Lara had saved her file</span>, <span class="restext">she wouldn't have lost her essay</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">4. Too much headphone time</div>
+          <p>Students use headphones for too long. Their ears hurt afterwards.</p>
+          <div class="use-line"><strong>Use:</strong> use / hurt</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Zero conditional.<br><em><span class="condtext">If students use headphones for too long</span>, <span class="restext">their ears hurt</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">5. Island life</div>
+          <p>You imagine living on a Greek island all year round.</p>
+          <div class="use-line"><strong>Use:</strong> live / swim</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Second conditional.<br><em><span class="condtext">If I lived on a Greek island</span>, <span class="restext">I would swim every day</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">6. Late night, tired now</div>
+          <p>I went to bed at 2 a.m., so now I'm exhausted.</p>
+          <div class="use-line"><strong>Use:</strong> not go / not be</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Mixed conditional.<br><em><span class="condtext">If I hadn't gone to bed so late</span>, <span class="restext">I wouldn't be exhausted now</span>.</em></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="topline">
+        <div class="badge">8 / Practice</div>
+        <div class="badge">Scenario set 2</div>
+      </div>
+      <h2>Scenario practice 2</h2>
+      <div class="practice-tools">
+        <p>Choose the best conditional, use the prompt verbs, say your sentence, then flip the card to check.</p>
+        <button class="small-btn" onclick="shufflePracticeCards('practiceFlipGrid2')">Shuffle cards</button>
+      </div>
+      <div class="flip-grid" id="practiceFlipGrid2">
+        <div class="situation-card scenario-card">
+          <div class="situation-title">1. Dream gadget</div>
+          <p>You imagine owning a drone with an amazing camera right now.</p>
+          <div class="use-line"><strong>Use:</strong> own / film</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Second conditional.<br><em><span class="condtext">If I owned a drone</span>, <span class="restext">I would film the whole city</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">2. Science fact</div>
+          <p>Metal gets hot and then becomes a little bigger.</p>
+          <div class="use-line"><strong>Use:</strong> get hot / expand</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Zero conditional.<br><em><span class="condtext">If metal gets hot</span>, <span class="restext">it expands</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">3. Stuck in traffic now</div>
+          <p>We left late, so now we are stuck in traffic.</p>
+          <div class="use-line"><strong>Use:</strong> leave / not be</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Mixed conditional.<br><em><span class="condtext">If we had left earlier</span>, <span class="restext">we wouldn't be stuck in traffic now</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">4. Museum trip</div>
+          <p>The bus may arrive on time tomorrow morning.</p>
+          <div class="use-line"><strong>Use:</strong> arrive / get</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> First conditional.<br><em><span class="condtext">If the bus arrives on time</span>, <span class="restext">we'll get to the museum by ten</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">5. Impatient character</div>
+          <p>Ben is very impatient, so yesterday he shouted at the referee.</p>
+          <div class="use-line"><strong>Use:</strong> not be / not shout</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Mixed conditional.<br><em><span class="condtext">If Ben weren't so impatient</span>, <span class="restext">he wouldn't have shouted at the referee</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">6. Wrong turn</div>
+          <p>They didn't check the map, so they got lost.</p>
+          <div class="use-line"><strong>Use:</strong> check / not get lost</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Third conditional.<br><em><span class="condtext">If they had checked the map</span>, <span class="restext">they wouldn't have got lost</span>.</em></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="topline">
+        <div class="badge">9 / Practice</div>
+        <div class="badge">Scenario set 3</div>
+      </div>
+      <h2>Scenario practice 3</h2>
+      <div class="practice-tools">
+        <p>Choose the best conditional, use the prompt verbs, say your sentence, then flip the card to check.</p>
+        <button class="small-btn" onclick="shufflePracticeCards('practiceFlipGrid3')">Shuffle cards</button>
+      </div>
+      <div class="flip-grid" id="practiceFlipGrid3">
+        <div class="situation-card scenario-card">
+          <div class="situation-title">1. Tomorrow's revision</div>
+          <p>You still have time to revise tonight before tomorrow's test.</p>
+          <div class="use-line"><strong>Use:</strong> revise / feel</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> First conditional.<br><em><span class="condtext">If you revise tonight</span>, <span class="restext">you'll feel calmer tomorrow</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">2. Shy in class</div>
+          <p>Sophia is quite shy, so yesterday she didn't answer the question.</p>
+          <div class="use-line"><strong>Use:</strong> not be / answer</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Mixed conditional.<br><em><span class="condtext">If Sophia weren't so shy</span>, <span class="restext">she would have answered the question yesterday</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">3. Plants</div>
+          <p>People forget to water plants. The plants die.</p>
+          <div class="use-line"><strong>Use:</strong> not water / die</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Zero conditional.<br><em><span class="condtext">If people don't water plants</span>, <span class="restext">they die</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">4. Camera battery</div>
+          <p>Dad didn't charge the battery, so the camera turned off.</p>
+          <div class="use-line"><strong>Use:</strong> charge / not turn off</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Third conditional.<br><em><span class="condtext">If Dad had charged the battery</span>, <span class="restext">the camera wouldn't have turned off</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">5. Robot chef</div>
+          <p>You imagine having a robot chef at home.</p>
+          <div class="use-line"><strong>Use:</strong> have / not wash</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Second conditional.<br><em><span class="condtext">If I had a robot chef</span>, <span class="restext">I would never wash dishes</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">6. Junk food</div>
+          <p>He ate too much junk food all week, so now he feels awful.</p>
+          <div class="use-line"><strong>Use:</strong> not eat / feel</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Mixed conditional.<br><em><span class="condtext">If he hadn't eaten so much junk food</span>, <span class="restext">he would feel better now</span>.</em></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="topline">
+        <div class="badge">10 / Practice</div>
+        <div class="badge">Scenario set 4</div>
+      </div>
+      <h2>Scenario practice 4</h2>
+      <div class="practice-tools">
+        <p>Choose the best conditional, use the prompt verbs, say your sentence, then flip the card to check.</p>
+        <button class="small-btn" onclick="shufflePracticeCards('practiceFlipGrid4')">Shuffle cards</button>
+      </div>
+      <div class="flip-grid" id="practiceFlipGrid4">
+        <div class="situation-card scenario-card">
+          <div class="situation-title">1. Cheaper tickets</div>
+          <p>We booked late, so the tickets were expensive.</p>
+          <div class="use-line"><strong>Use:</strong> book / find</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Third conditional.<br><em><span class="condtext">If we had booked earlier</span>, <span class="restext">we would have found cheaper tickets</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">2. Colour mixing</div>
+          <p>You mix red and blue paint. The result is purple.</p>
+          <div class="use-line"><strong>Use:</strong> mix / get</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Zero conditional.<br><em><span class="condtext">If you mix red and blue</span>, <span class="restext">you get purple</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">3. Umbrella</div>
+          <p>She forgot her umbrella, so now she is wet.</p>
+          <div class="use-line"><strong>Use:</strong> not forget / not be</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Mixed conditional.<br><em><span class="condtext">If she hadn't forgotten her umbrella</span>, <span class="restext">she wouldn't be wet now</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">4. Rooftop garden</div>
+          <p>You imagine your school with a beautiful rooftop garden.</p>
+          <div class="use-line"><strong>Use:</strong> have / love</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Second conditional.<br><em><span class="condtext">If our school had a rooftop garden</span>, <span class="restext">students would love it</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">5. Match on Friday</div>
+          <p>The team can still practise harder this week before Friday's match.</p>
+          <div class="use-line"><strong>Use:</strong> practise / win</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> First conditional.<br><em><span class="condtext">If the team practises harder this week</span>, <span class="restext">it'll win on Friday</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">6. Broken vase</div>
+          <p>Tom is careless, so yesterday he broke the vase.</p>
+          <div class="use-line"><strong>Use:</strong> be / not break</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Mixed conditional.<br><em><span class="condtext">If Tom were more careful</span>, <span class="restext">he wouldn't have broken the vase yesterday</span>.</em></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="topline">
+        <div class="badge">11 / Practice</div>
+        <div class="badge">Scenario set 5</div>
+      </div>
+      <h2>Scenario practice 5</h2>
+      <div class="practice-tools">
+        <p>Choose the best conditional, use the prompt verbs, say your sentence, then flip the card to check.</p>
+        <button class="small-btn" onclick="shufflePracticeCards('practiceFlipGrid5')">Shuffle cards</button>
+      </div>
+      <div class="flip-grid" id="practiceFlipGrid5">
+        <div class="situation-card scenario-card">
+          <div class="situation-title">1. Maths problem</div>
+          <p>I'm not very good at maths, so yesterday I couldn't solve the problem.</p>
+          <div class="use-line"><strong>Use:</strong> be / solve</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Mixed conditional.<br><em><span class="condtext">If I were better at maths</span>, <span class="restext">I would have solved that problem yesterday</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">2. Extra day</div>
+          <p>The teacher may give us one more day for the project.</p>
+          <div class="use-line"><strong>Use:</strong> give / finish</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> First conditional.<br><em><span class="condtext">If the teacher gives us an extra day</span>, <span class="restext">we'll finish the project properly</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">3. Laptop battery</div>
+          <p>You don't plug in the laptop. The battery runs out.</p>
+          <div class="use-line"><strong>Use:</strong> not plug in / run out</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Zero conditional.<br><em><span class="condtext">If you don't plug in the laptop</span>, <span class="restext">the battery runs out</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">4. Missed bus</div>
+          <p>Mia didn't set an alarm, so she missed the bus.</p>
+          <div class="use-line"><strong>Use:</strong> set / not miss</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Third conditional.<br><em><span class="condtext">If Mia had set an alarm</span>, <span class="restext">she wouldn't have missed the bus</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">5. Hungry now</div>
+          <p>They didn't bring snacks, so now they are hungry.</p>
+          <div class="use-line"><strong>Use:</strong> bring / not be</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Mixed conditional.<br><em><span class="condtext">If they had brought snacks</span>, <span class="restext">they wouldn't be hungry now</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">6. Tokyo job</div>
+          <p>You imagine speaking Japanese well enough to work abroad.</p>
+          <div class="use-line"><strong>Use:</strong> speak / apply</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Second conditional.<br><em><span class="condtext">If I spoke Japanese</span>, <span class="restext">I would apply for that job in Tokyo</span>.</em></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="topline">
+        <div class="badge">12 / Practice</div>
+        <div class="badge">Scenario set 6</div>
+      </div>
+      <h2>Scenario practice 6</h2>
+      <div class="practice-tools">
+        <p>Choose the best conditional, use the prompt verbs, say your sentence, then flip the card to check.</p>
+        <button class="small-btn" onclick="shufflePracticeCards('practiceFlipGrid6')">Shuffle cards</button>
+      </div>
+      <div class="flip-grid" id="practiceFlipGrid6">
+        <div class="situation-card scenario-card">
+          <div class="situation-title">1. Ice</div>
+          <p>Ice melts and turns into water.</p>
+          <div class="use-line"><strong>Use:</strong> melt / turn</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Zero conditional.<br><em><span class="condtext">If ice melts</span>, <span class="restext">it turns into water</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">2. Sleepy now</div>
+          <p>We binged that series all night, so now we are very sleepy.</p>
+          <div class="use-line"><strong>Use:</strong> not binge / not be</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Mixed conditional.<br><em><span class="condtext">If we hadn't binged that series</span>, <span class="restext">we wouldn't be so sleepy now</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">3. Learn guitar</div>
+          <p>Leo doesn't have much free time, but he imagines having more.</p>
+          <div class="use-line"><strong>Use:</strong> have / learn</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Second conditional.<br><em><span class="condtext">If Leo had more free time</span>, <span class="restext">he would learn the guitar</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">4. Stolen bike</div>
+          <p>You didn't lock your bike, so it was stolen.</p>
+          <div class="use-line"><strong>Use:</strong> lock / not steal</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Third conditional.<br><em><span class="condtext">If you had locked your bike</span>, <span class="restext">it wouldn't have been stolen</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">5. Afternoon weather</div>
+          <p>The rain might stop later this afternoon.</p>
+          <div class="use-line"><strong>Use:</strong> stop / play</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> First conditional.<br><em><span class="condtext">If the rain stops this afternoon</span>, <span class="restext">we'll play outside</span>.</em></div>
+        </div>
+        <div class="situation-card scenario-card">
+          <div class="situation-title">6. Afraid of dogs</div>
+          <p>Anna is afraid of dogs, so yesterday she didn't visit us.</p>
+          <div class="use-line"><strong>Use:</strong> not be / visit</div>
+          <button class="reveal-btn" onclick="toggleReveal(this)">Flip card</button>
+          <div class="reveal"><strong>Best fit:</strong> Mixed conditional.<br><em><span class="condtext">If Anna weren't afraid of dogs</span>, <span class="restext">she would have visited us yesterday</span>.</em></div>
+        </div>
+      </div>
+    </section>
+
+<div class="global-footer">Panagiotis Domvros, English &amp; Drama Teacher, Principal of 1st Middle School of Pylea</div>
+
+    <div class="nav">
+      <button class="nav-btn" onclick="changeSlide(-1)">← Back</button>
+      <div class="nav-center" id="dots" aria-live="polite"></div>
+      <button class="nav-btn" onclick="changeSlide(1)">Next →</button>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const dotsWrap = document.getElementById('dots');
+    let currentSlide = 0;
+
+    function renderCounter() {
+      dotsWrap.textContent = `${currentSlide + 1} / ${slides.length}`;
+    }
+
+    function showSlide(index) {
+      currentSlide = (index + slides.length) % slides.length;
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === currentSlide));
+      renderCounter();
+      slides[currentSlide].scrollTop = 0;
+      window.scrollTo(0, 0);
+    }
+
+    function changeSlide(step) {
+      showSlide(currentSlide + step);
+    }
+
+    renderCounter();
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') changeSlide(1);
+      if (e.key === 'ArrowLeft') changeSlide(-1);
+    });
+
+    let startX = null;
+    document.addEventListener('touchstart', (e) => {
+      startX = e.changedTouches[0].clientX;
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+      if (startX === null) return;
+      const endX = e.changedTouches[0].clientX;
+      const diff = endX - startX;
+      if (Math.abs(diff) > 60) {
+        if (diff < 0) changeSlide(1);
+        else changeSlide(-1);
+      }
+      startX = null;
+    }, { passive: true });
+
+    function toggleReveal(btn) {
+      const reveal = btn.nextElementSibling;
+      reveal.classList.toggle('show');
+      if (btn.closest('.flip-grid')) {
+        btn.textContent = reveal.classList.contains('show') ? 'Hide answer' : 'Flip card';
+      } else {
+        btn.textContent = reveal.classList.contains('show') ? 'Hide' : 'Reveal';
+      }
+    }
+
+    function shufflePracticeCards(gridId) {
+      const grid = document.getElementById(gridId || 'practiceFlipGrid1');
+      if (!grid) return;
+      const cards = Array.from(grid.children);
+      for (let i = cards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cards[i], cards[j]] = [cards[j], cards[i]];
+      }
+      cards.forEach(card => {
+        const reveal = card.querySelector('.reveal');
+        const btn = card.querySelector('.reveal-btn');
+        if (reveal) reveal.classList.remove('show');
+        if (btn) btn.textContent = 'Flip card';
+        grid.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>
